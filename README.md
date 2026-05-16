@@ -1,8 +1,28 @@
-# Server 
-# Termux Public File Server (Cloudflare Tunnel)
+# Portable File Share
 
-Start a local HTTP server in Termux and expose it to the internet using Cloudflare Tunnel.
+Advanced portable file sharing server using:
 
-## Requirements
+- Flask
+- Cloudflare Tunnel
+- QR Code Sharing
+- Mobile Friendly UI
+- Upload & Download
+- ZIP Download
+- Linux Support
+- ARM/AMD64 Support
+
+## Features
+
+- Cloudflare public URL
+- QR code generation
+- Multi-file upload
+- Download all ZIP
+- Mobile support
+- LAN access
+- Dark UI
+- Fast setup
+
+## Install
+
 ```bash
-pkg install python wget
+pip install -r requirements.txt
