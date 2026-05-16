@@ -4,7 +4,11 @@ from flask import (
     Flask,
     request,
     send_from_directory,
-    render_template
+    render_template,
+    send_file,
+    redirect,
+    url_for,
+    abort
 )
 
 import os
@@ -12,6 +16,7 @@ import socket
 import subprocess
 import threading
 import re
+import io
 import qrcode
 import platform
 import shutil
@@ -19,6 +24,7 @@ import signal
 import sys
 import zipfile
 from datetime import datetime
+from werkzeug.utils import secure_filename
 
 # =========================
 # CONFIG
@@ -31,6 +37,7 @@ os.makedirs(UPLOAD_FOLDER, exist_ok=True)
 
 app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
+app.config["MAX_CONTENT_LENGTH"] = 100 * 1024 * 1024
 
 cloudflared_proc = None
 public_url = None
@@ -201,19 +208,23 @@ def start_cloudflare():
 @app.route("/download-all")
 def download_all():
 
-    zip_name = "shared_files.zip"
+    zip_buffer = io.BytesIO()
 
-    with zipfile.ZipFile(zip_name, "w") as zipf:
+    with zipfile.ZipFile(zip_buffer, "w", zipfile.ZIP_DEFLATED) as zipf:
 
         for file in os.listdir(UPLOAD_FOLDER):
 
             path = os.path.join(UPLOAD_FOLDER, file)
 
-            zipf.write(path, arcname=file)
+            if os.path.isfile(path):
+                zipf.write(path, arcname=file)
 
-    return send_from_directory(
-        ".",
-        zip_name,
+    zip_buffer.seek(0)
+
+    return send_file(
+        zip_buffer,
+        mimetype="application/zip",
+        download_name="shared_files.zip",
         as_attachment=True
     )
 
@@ -232,9 +243,14 @@ def home():
 
             if f.filename:
 
+                safe_name = secure_filename(f.filename)
+
+                if not safe_name:
+                    continue
+
                 path = os.path.join(
                     app.config["UPLOAD_FOLDER"],
-                    f.filename
+                    safe_name
                 )
 
                 f.save(path)
@@ -268,6 +284,14 @@ def home():
 @app.route("/download/<filename>")
 def download(filename):
 
+    if not filename or filename != secure_filename(filename):
+        abort(404)
+
+    path = os.path.join(UPLOAD_FOLDER, filename)
+
+    if not os.path.isfile(path):
+        abort(404)
+
     return send_from_directory(
         UPLOAD_FOLDER,
         filename,
@@ -278,18 +302,21 @@ def download(filename):
 # =========================
 # DELETE FILE
 # =========================
-@app.route("/delete/<filename>")
+@app.route("/delete/<filename>", methods=["POST"])
 def delete(filename):
+
+    if not filename or filename != secure_filename(filename):
+        abort(404)
 
     path = os.path.join(
         UPLOAD_FOLDER,
         filename
     )
 
-    if os.path.exists(path):
+    if os.path.isfile(path):
         os.remove(path)
 
-    return home()
+    return redirect(url_for("home"))
 
 
 # =========================

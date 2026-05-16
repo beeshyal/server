@@ -150,9 +150,14 @@ Download
 
 |
 
-<a href="/delete/{{ file.name }}">
+<form method="POST"
+action="/delete/{{ file.name }}"
+style="display:inline;">
+<button type="submit"
+style="display:inline;width:auto;padding:8px 12px;margin:0;background:#cc3333;">
 Delete
-</a>
+</button>
+</form>
 
 </div>
 
