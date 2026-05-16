@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+<meta charset="UTF-8">
+
+<meta name="viewport"
+content="width=device-width, initial-scale=1.0">
+
+<title>Portable File Share</title>
+
+<style>
+
+body{
+background:#111;
+color:white;
+font-family:Arial;
+padding:20px;
+}
+
+.container{
+max-width:900px;
+margin:auto;
+}
+
+.card{
+background:#1e1e1e;
+padding:20px;
+border-radius:12px;
+margin-bottom:20px;
+}
+
+input{
+width:100%;
+padding:12px;
+margin:10px 0;
+background:#222;
+border:none;
+border-radius:8px;
+color:white;
+}
+
+button{
+padding:12px;
+width:100%;
+background:#00aa55;
+border:none;
+border-radius:8px;
+color:white;
+font-size:16px;
+cursor:pointer;
+}
+
+.file{
+padding:15px;
+border-bottom:1px solid #333;
+}
+
+a{
+color:#00ff99;
+text-decoration:none;
+}
+
+.top{
+display:flex;
+justify-content:space-between;
+align-items:center;
+}
+
+.small{
+font-size:14px;
+color:#aaa;
+}
+
+.url{
+word-break:break-all;
+background:#222;
+padding:10px;
+border-radius:8px;
+margin-top:10px;
+}
+
+</style>
+
+</head>
+
+<body>
+
+<div class="container">
+
+<div class="card">
+
+<h1>Portable File Share</h1>
+
+<div class="url">
+{{ public_url }}
+</div>
+
+</div>
+
+<div class="card">
+
+<h2>Upload Files</h2>
+
+<form method="POST"
+enctype="multipart/form-data">
+
+<input type="file"
+name="file"
+multiple
+required>
+
+<button type="submit">
+Upload Files
+</button>
+
+</form>
+
+</div>
+
+<div class="card">
+
+<div class="top">
+
+<h2>Shared Files</h2>
+
+<a href="/download-all">
+Download All ZIP
+</a>
+
+</div>
+
+{% for file in files %}
+
+<div class="file">
+
+<h3>{{ file.name }}</h3>
+
+<div class="small">
+{{ file.size }} KB |
+{{ file.time }}
+</div>
+
+<br>
+
+<a href="/download/{{ file.name }}">
+Download
+</a>
+
+|
+
+<a href="/delete/{{ file.name }}">
+Delete
+</a>
+
+</div>
+
+{% endfor %}
+
+</div>
+
+</div>
+
+</body>
+
+</html>
