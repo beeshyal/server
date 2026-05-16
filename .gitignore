@@ -1,0 +1,6 @@
+cloudflared
+__pycache__/
+*.pyc
+shared/*
+shared_files.zip
+share_qr.png
