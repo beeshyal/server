@@ -24,7 +24,7 @@ import signal
 import sys
 import zipfile
 from datetime import datetime
-from werkzeug.utils import secure_filename
+from werkzeug.utils import secure_filename, safe_join
 
 # =========================
 # CONFIG
@@ -285,11 +285,11 @@ def home():
 def download(filename):
 
     if not filename or filename != secure_filename(filename):
-        abort(404)
+        abort(400)
 
-    path = os.path.join(UPLOAD_FOLDER, filename)
+    path = safe_join(UPLOAD_FOLDER, filename)
 
-    if not os.path.isfile(path):
+    if path is None or not os.path.isfile(path):
         abort(404)
 
     return send_from_directory(
@@ -306,14 +306,11 @@ def download(filename):
 def delete(filename):
 
     if not filename or filename != secure_filename(filename):
-        abort(404)
+        abort(400)
 
-    path = os.path.join(
-        UPLOAD_FOLDER,
-        filename
-    )
+    path = safe_join(UPLOAD_FOLDER, filename)
 
-    if os.path.isfile(path):
+    if path is not None and os.path.isfile(path):
         os.remove(path)
 
     return redirect(url_for("home"))
