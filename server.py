@@ -81,16 +81,16 @@ def local_ip():
 # =========================
 def generate_qr(url):
 
-    img = qrcode.make(url)
-
-    img.save("share_qr.png")
-
-    success("QR Code saved: share_qr.png")
-
     try:
-        img.show()
-    except Exception:
-        pass
+        img = qrcode.make(url)
+        img.save("share_qr.png")
+        success("QR Code saved: share_qr.png")
+        try:
+            img.show()
+        except Exception:
+            pass
+    except Exception as e:
+        error(f"QR generation failed (install Pillow): {e}")
 
 
 # =========================
@@ -165,7 +165,7 @@ def download_cloudflared():
 # CLOUDFLARE TUNNEL
 # =========================
 TUNNEL_URL_PATTERN = re.compile(
-    r"https://[-0-9a-zA-Z]+\.trycloudflare\.com"
+    r"https://[a-zA-Z0-9][-a-zA-Z0-9]*-[a-zA-Z0-9]+\.trycloudflare\.com"
 )
 TUNNEL_TIMEOUT   = 60   # seconds to wait for URL per attempt
 TUNNEL_MAX_RETRY = 5    # maximum restart attempts
