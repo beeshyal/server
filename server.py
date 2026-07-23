@@ -29,11 +29,14 @@ from werkzeug.utils import secure_filename
 # CONFIG
 # =========================
 UPLOAD_FOLDER = "shared"
+QR_FOLDER = "static"
+QR_FILENAME = "share_qr.png"
 PORT = 8000
 BIN = "cloudflared"
 MAX_CONTENT_LENGTH = 500 * 1024 * 1024  # 500 MB upload limit
 
 os.makedirs(UPLOAD_FOLDER, exist_ok=True)
+os.makedirs(QR_FOLDER, exist_ok=True)
 
 app = Flask(__name__)
 app.config["UPLOAD_FOLDER"] = UPLOAD_FOLDER
@@ -83,8 +86,9 @@ def generate_qr(url):
 
     try:
         img = qrcode.make(url)
-        img.save("share_qr.png")
-        success("QR Code saved: share_qr.png")
+        qr_path = os.path.join(QR_FOLDER, QR_FILENAME)
+        img.save(qr_path)
+        success(f"QR Code saved: {qr_path}")
         try:
             img.show()
         except Exception:
@@ -354,7 +358,8 @@ def home():
     return render_template(
         "index.html",
         files=files,
-        public_url=public_url
+        public_url=public_url,
+        qr_filename=QR_FILENAME if public_url else None
     )
 
 

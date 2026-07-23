@@ -81,6 +81,13 @@ border-radius:8px;
 margin-top:10px;
 }
 
+.qr{
+margin-top:15px;
+max-width:220px;
+width:100%;
+border-radius:8px;
+}
+
 </style>
 
 </head>
@@ -96,6 +103,12 @@ margin-top:10px;
 <div class="url">
 {{ public_url }}
 </div>
+
+{% if qr_filename %}
+<img class="qr"
+src="{{ url_for('static', filename=qr_filename) }}"
+alt="Live session QR code">
+{% endif %}
 
 </div>
 
